@@ -35,6 +35,7 @@ class Hank {
   protected client: HankClientImpl;
   protected metadata: Metadata;
   protected messageHandler: Function | undefined;
+  protected commandHandler: Function | undefined;
   protected installFn: Function | undefined;
   protected initializeFn: Function | undefined;
 
@@ -79,6 +80,15 @@ class Hank {
       this.messageHandler(input);
     }
   }
+  public registerCommandHandler(commandHandler: Function) {
+    this.commandHandler = commandHandler;
+  }
+
+  public handleCommand(input: HandleCommandInput) {
+    if (this.commandHandler) {
+      this.commandHandler(input);
+    }
+  }
 
   public registerInstallFunction(fn: Function) {
     this.installFn = fn;
@@ -106,11 +116,23 @@ export const hank = globalThis.hank = new Hank();
 export interface HandleMessageInput {
   message: Message,
 }
+
+export interface HandleCommandInput {
+  message: Message,
+}
+
 export function handle_message() {
   const message = Message.decode(new Uint8Array(Host.inputBytes()));
   const input: HandleMessageInput = { message: message };
 
   hank.handleMessage(input);
+}
+
+export function handle_command() {
+  const message = Message.decode(new Uint8Array(Host.inputBytes()));
+  const input: HandleCommandInput = { message: message };
+
+  hank.handleCommand(input);
 }
 
 export function get_metadata() {

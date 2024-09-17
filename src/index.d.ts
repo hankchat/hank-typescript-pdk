@@ -1,9 +1,10 @@
 declare module "main" {
-    export function get_metadata(): I64;
-    export function handle_message();
     export function hank();
+    export function get_metadata(): I64;
     export function install();
     export function initialize();
+    export function handle_message();
+    export function handle_command();
 }
 
 declare module "extism:host" {
