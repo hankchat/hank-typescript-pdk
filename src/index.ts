@@ -1,6 +1,6 @@
 import {
   CronInput, CronJob, DbQueryInput, DbQueryOutput, HankClientImpl, Message,
-  Metadata, PreparedStatement, ReactInput, Reaction, Results, Rpc,
+  Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, Results, Rpc,
   SendMessageInput
 } from "@hank.chat/types";
 
@@ -13,12 +13,13 @@ class HankRpc implements Rpc {
   protected cron;
 
   public constructor() {
-    const { send_message, react, db_query, cron } = Host.getFunctions();
+    const { send_message, react, db_query, cron, one_shot } = Host.getFunctions();
 
     this.send_message = send_message;
     this.react = react;
     this.db_query = db_query;
     this.cron = cron;
+    this.one_shot = one_shot;
   }
 
   public request(_service: string, method: string, data: Uint8Array): Promise<Uint8Array> {
@@ -68,6 +69,15 @@ class Hank {
       job: job.name,
     });
     this.client.cron(CronInput.create({ cronJob: cronjob }));
+  }
+
+  public oneShot(duration: number, job: Function) {
+    this.cronjobs.set(job.name, job);
+    const oneshot = OneShotJob.create({
+      duration,
+      job: job.name,
+    });
+    this.client.one_shot(OneShotInput.create({ oneShotJob: oneshot }));
   }
 
   get pluginMetadata(): Metadata {

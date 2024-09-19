@@ -14,6 +14,7 @@ declare module "extism:host" {
     react(input: I64): I64;
     db_query(input: I64): I64;
     cron(input: I64): I64;
+    one_shot(input: I64): I64;
   }
 }
 
