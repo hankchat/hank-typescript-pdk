@@ -38,10 +38,12 @@ class Hank {
   protected commandHandler: Function | undefined;
   protected installFn: Function | undefined;
   protected initializeFn: Function | undefined;
+  protected cronjobs: Map<string, Function>;
 
   public constructor() {
     this.client = new HankClientImpl(new HankRpc());
     this.metadata = Metadata.create();
+    this.cronjobs = new Map<string, Function>();
   }
 
   public sendMessage(message: Message) {
@@ -59,7 +61,12 @@ class Hank {
     return (response.results as Results);
   }
 
-  public cron(cronjob: CronJob) {
+  public cron(cron: string, job: Function) {
+    this.cronjobs.set(job.name, job);
+    const cronjob = CronJob.create({
+      cron,
+      job: job.name,
+    });
     this.client.cron(CronInput.create({ cronJob: cronjob }));
   }
 
@@ -109,6 +116,12 @@ class Hank {
       this.initializeFn();
     }
   }
+
+  public handleCron(func: string) {
+    if (this.cronjobs.has(func)) {
+      (this.cronjobs.get(func) as Function)();
+    }
+  }
 }
 
 export const hank = globalThis.hank = new Hank();
@@ -133,6 +146,10 @@ export function handle_command() {
   const input: HandleCommandInput = { message: message };
 
   hank.handleCommand(input);
+}
+
+export function handle_cron() {
+  hank.handleCron(Host.inputString());
 }
 
 export function get_metadata() {
