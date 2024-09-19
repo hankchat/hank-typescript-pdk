@@ -31,7 +31,7 @@ class HankRpc implements Rpc {
   }
 }
 
-export class Hank {
+class Hank {
   protected client: HankClientImpl;
   protected metadata: Metadata;
   protected messageHandler: Function | undefined;
