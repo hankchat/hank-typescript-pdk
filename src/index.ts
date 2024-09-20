@@ -3,6 +3,7 @@ import {
   Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, Results, Rpc,
   SendMessageInput
 } from "@hank.chat/types";
+import { JsonObject } from "type-fest";
 
 class HankRpc implements Rpc {
   [index: string]: any;
@@ -55,11 +56,11 @@ class Hank {
     this.client.react(ReactInput.create({ reaction: reaction }));
   }
 
-  public async dbQuery(preparedStatement: PreparedStatement): Promise<Results> {
+  public async dbQuery<T extends JsonObject>(preparedStatement: PreparedStatement): Promise<Array<T>> {
     let response: DbQueryOutput = await this.client.db_query(
       DbQueryInput.create({ preparedStatement: preparedStatement })
     );
-    return (response.results as Results);
+    return (response.results as Results).rows.map(row => JSON.parse(row) as T);
   }
 
   public cron(cron: string, job: Function) {

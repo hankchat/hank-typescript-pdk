@@ -11,6 +11,7 @@
     "types": [
       "@extism/js-pdk",
       "@hank.chat/types",
+      "type-fest",
       "./src/plugin.d.ts"
     ]
   },
