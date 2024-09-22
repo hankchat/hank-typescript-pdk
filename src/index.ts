@@ -164,13 +164,7 @@ export function handle_cron() {
 }
 
 export function get_metadata() {
-  console.log("here");
-  console.log(hank.pluginMetadata);
-  let metadata = Metadata.encode(hank.pluginMetadata).finish().buffer;
-
-  console.log(metadata);
-
-  Host.outputBytes(metadata);
+  Host.outputBytes(Metadata.encode(hank.pluginMetadata).finish().buffer);
 }
 
 export function install() {
