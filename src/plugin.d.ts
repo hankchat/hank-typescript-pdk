@@ -1,6 +1,6 @@
 declare module "main" {
   export function hank();
-  export function get_metadata(): I64;
+  export function get_metadata(): I32;
   export function install();
   export function initialize();
   export function handle_message();
