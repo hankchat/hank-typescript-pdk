@@ -10,6 +10,7 @@
     "types": [
       "@extism/js-pdk",
       "@hank.chat/types",
+      "@types/uuid",
       "type-fest",
       "./src/plugin.d.ts"
     ]

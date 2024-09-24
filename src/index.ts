@@ -4,7 +4,7 @@ import {
   SendMessageInput
 } from "@hank.chat/types";
 import { JsonObject } from "type-fest";
-import { nanoid } from "nanoid";
+import { v4 as uuidv4 } from "uuid";
 
 class HankRpc implements Rpc {
   [index: string]: any;
@@ -65,21 +65,21 @@ class Hank {
   }
 
   public cron(cron: string, job: Function) {
-    const id = nanoid();
-    this.cronjobs.set(id, job);
+    const uuid = uuidv4();
+    this.cronjobs.set(uuid, job);
     const cronjob = CronJob.create({
       cron,
-      job: id,
+      job: uuid,
     });
     this.client.cron(CronInput.create({ cronJob: cronjob }));
   }
 
   public oneShot(duration: number, job: Function) {
-    const id = nanoid();
-    this.cronjobs.set(id, job);
+    const uuid = uuidv4();
+    this.cronjobs.set(uuid, job);
     const oneshot = OneShotJob.create({
       duration,
-      job: id,
+      job: uuid,
     });
     this.client.one_shot(OneShotInput.create({ oneShotJob: oneshot }));
   }
