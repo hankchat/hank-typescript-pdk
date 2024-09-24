@@ -27,9 +27,11 @@
   "devDependencies": {
     "@extism/js-pdk": "^1.0.1",
     "@hank.chat/types": "^0.1.22",
+    "@types/uuid": "^10.0.0",
     "tsup": "^8.2.4",
     "type-fest": "^4.26.1",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "uuid": "^10.0.0"
   },
   "exports": "./dist/index.js"
 }
