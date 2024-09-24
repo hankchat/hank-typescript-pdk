@@ -1,6 +1,6 @@
 {
   "name": "@hank.chat/pdk",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "TypeScript PDK for Hank",
   "files": [
     "dist"
