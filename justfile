@@ -16,6 +16,6 @@ alias e := edit
     $EDITOR "{{ justfile() }}"
 
 publish:
-    npm version patch
     npm run build
+    npm version patch
     npm publish
