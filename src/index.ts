@@ -5,7 +5,6 @@ import {
 } from "@hank.chat/types";
 import { JsonObject } from "type-fest";
 
-export const importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 class HankRpc implements Rpc {
   [index: string]: any;
@@ -66,7 +65,7 @@ class Hank {
   }
 
   public async cron(cron: string, job: Function) {
-    const { v4 } = await importDynamic("uuid");
+    const { v4 } = await (eval(`import("uuid")`) as Promise<typeof import("uuid")>);
     const uuid = v4();
     this.cronjobs.set(uuid, job);
     const cronjob = CronJob.create({
@@ -77,7 +76,7 @@ class Hank {
   }
 
   public async oneShot(duration: number, job: Function) {
-    const { v4 } = await importDynamic("uuid");
+    const { v4 } = await (eval(`import("uuid")`) as Promise<typeof import("uuid")>);
     const uuid = v4();
     this.cronjobs.set(uuid, job);
     const oneshot = OneShotJob.create({
