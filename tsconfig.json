@@ -8,11 +8,9 @@
       "es2020"
     ],
     "strict": true,
-    "skipLibCheck": true,
     "types": [
       "@extism/js-pdk",
       "@hank.chat/types",
-      "@types/uuid",
       "type-fest",
       "./src/plugin.d.ts"
     ]
