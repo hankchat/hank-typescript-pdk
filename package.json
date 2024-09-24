@@ -6,7 +6,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "node esbuild.js",
+    "build": "rm -rf ./dist/ && node esbuild.js",
     "postbuild": "cp src/plugin.d.ts dist"
   },
   "repository": {
@@ -30,6 +30,7 @@
     "@hank.chat/types": "^0.1.26",
     "@types/uuid": "^10.0.0",
     "esbuild": "^0.24.0",
+    "polyfill-crypto-methods": "^0.2.0",
     "type-fest": "^4.26.1",
     "typescript": "^5.6.2",
     "uuid": "^10.0.0"

@@ -4,6 +4,7 @@ import {
   SendMessageInput
 } from "@hank.chat/types";
 import { JsonObject } from "type-fest";
+import "polyfill-crypto-methods";
 import { v4 as uuidv4 } from "uuid";
 
 class HankRpc implements Rpc {
