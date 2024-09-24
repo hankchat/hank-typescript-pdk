@@ -4,6 +4,7 @@ import {
   SendMessageInput
 } from "@hank.chat/types";
 import { JsonObject } from "type-fest";
+import { v4 as uuidv4 } from "uuid";
 
 
 class HankRpc implements Rpc {
@@ -64,9 +65,8 @@ class Hank {
     return (response.results as Results).rows.map(row => JSON.parse(row) as T);
   }
 
-  public async cron(cron: string, job: Function) {
-    const { v4 } = await import("uuid");
-    const uuid = v4();
+  public cron(cron: string, job: Function) {
+    const uuid = uuidv4();
     this.cronjobs.set(uuid, job);
     const cronjob = CronJob.create({
       cron,
@@ -75,9 +75,8 @@ class Hank {
     this.client.cron(CronInput.create({ cronJob: cronjob }));
   }
 
-  public async oneShot(duration: number, job: Function) {
-    const { v4 } = await import("uuid");
-    const uuid = v4();
+  public oneShot(duration: number, job: Function) {
+    const uuid = uuidv4();
     this.cronjobs.set(uuid, job);
     const oneshot = OneShotJob.create({
       duration,
