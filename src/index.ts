@@ -65,7 +65,7 @@ class Hank {
   }
 
   public async cron(cron: string, job: Function) {
-    const { v4 } = await (eval(`import("uuid")`) as Promise<typeof import("uuid")>);
+    const { v4 } = await import("uuid");
     const uuid = v4();
     this.cronjobs.set(uuid, job);
     const cronjob = CronJob.create({
@@ -76,7 +76,7 @@ class Hank {
   }
 
   public async oneShot(duration: number, job: Function) {
-    const { v4 } = await (eval(`import("uuid")`) as Promise<typeof import("uuid")>);
+    const { v4 } = await import("uuid");
     const uuid = v4();
     this.cronjobs.set(uuid, job);
     const oneshot = OneShotJob.create({
