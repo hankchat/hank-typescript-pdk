@@ -6,7 +6,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "node esbuild.js",
+    "postbuild": "cp src/plugin.d.ts dist"
   },
   "repository": {
     "type": "git",
@@ -27,9 +28,11 @@
   "devDependencies": {
     "@extism/js-pdk": "^1.0.1",
     "@hank.chat/types": "^0.1.26",
-    "tsup": "^8.2.4",
+    "@types/uuid": "^10.0.0",
+    "esbuild": "^0.24.0",
     "type-fest": "^4.26.1",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "uuid": "^10.0.0"
   },
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts"

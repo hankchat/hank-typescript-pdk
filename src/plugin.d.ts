@@ -1,5 +1,4 @@
 declare module "main" {
-  export const importDynamic: Function;
   export function hank();
   export function get_metadata(): I32;
   export function install();
