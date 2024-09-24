@@ -4,7 +4,8 @@ import {
   SendMessageInput
 } from "@hank.chat/types";
 import { JsonObject } from "type-fest";
-import { v4 as uuidv4 } from "uuid";
+
+export const importDynamic = new Function('modulePath', 'return import(modulePath)');
 
 class HankRpc implements Rpc {
   [index: string]: any;
@@ -65,7 +66,8 @@ class Hank {
   }
 
   public cron(cron: string, job: Function) {
-    const uuid = uuidv4();
+    const { v4 } = importDynamic("uuid");
+    const uuid = v4();
     this.cronjobs.set(uuid, job);
     const cronjob = CronJob.create({
       cron,
@@ -75,7 +77,8 @@ class Hank {
   }
 
   public oneShot(duration: number, job: Function) {
-    const uuid = uuidv4();
+    const { v4 } = importDynamic("uuid");
+    const uuid = v4();
     this.cronjobs.set(uuid, job);
     const oneshot = OneShotJob.create({
       duration,
