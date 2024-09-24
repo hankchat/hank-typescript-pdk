@@ -6,7 +6,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf ./dist/ && node esbuild.js",
+    "build": "rm -rf ./dist/ && node esbuild.js && tsc --skipLibCheck --declaration --emitDeclarationOnly --outDir dist",
     "postbuild": "cp src/plugin.d.ts dist"
   },
   "repository": {
@@ -27,7 +27,7 @@
   "homepage": "https://github.com/hankchat/hank-typescript-pdk#readme",
   "devDependencies": {
     "@extism/js-pdk": "^1.0.1",
-    "@hank.chat/types": "^0.1.27",
+    "@hank.chat/types": "^0.1.28",
     "@types/uuid": "^10.0.0",
     "esbuild": "^0.24.0",
     "polyfill-crypto-methods": "^0.2.0",
