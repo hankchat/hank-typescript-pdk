@@ -8,6 +8,7 @@
       "es2020"
     ],
     "strict": true,
+    "skipLibCheck": true,
     "types": [
       "@extism/js-pdk",
       "@hank.chat/types",
