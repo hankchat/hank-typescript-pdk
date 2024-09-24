@@ -65,8 +65,8 @@ class Hank {
     return (response.results as Results).rows.map(row => JSON.parse(row) as T);
   }
 
-  public cron(cron: string, job: Function) {
-    const { v4 } = importDynamic("uuid");
+  public async cron(cron: string, job: Function) {
+    const { v4 } = await importDynamic("uuid");
     const uuid = v4();
     this.cronjobs.set(uuid, job);
     const cronjob = CronJob.create({
@@ -76,8 +76,8 @@ class Hank {
     this.client.cron(CronInput.create({ cronJob: cronjob }));
   }
 
-  public oneShot(duration: number, job: Function) {
-    const { v4 } = importDynamic("uuid");
+  public async oneShot(duration: number, job: Function) {
+    const { v4 } = await importDynamic("uuid");
     const uuid = v4();
     this.cronjobs.set(uuid, job);
     const oneshot = OneShotJob.create({
