@@ -1,4 +1,8 @@
 import {
+  AccessCheck,
+  AccessCheckChain,
+  AccessCheckOperator,
+  accessCheckOperatorFromJSON,
   CronInput, CronJob, DbQueryInput, DbQueryOutput, HankClientImpl, Message,
   Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, Results, Rpc,
   SendMessageInput
@@ -37,7 +41,7 @@ class HankRpc implements Rpc {
 
 class Hank {
   protected client: HankClientImpl;
-  protected metadata: Metadata;
+  protected metadata: Metadata | undefined;
   protected messageHandler: Function | undefined;
   protected commandHandler: Function | undefined;
   protected installFn: Function | undefined;
@@ -46,7 +50,6 @@ class Hank {
 
   public constructor() {
     this.client = new HankClientImpl(new HankRpc());
-    this.metadata = Metadata.create();
     this.cronjobs = new Map<string, Function>();
   }
 
@@ -86,7 +89,7 @@ class Hank {
   }
 
   get pluginMetadata(): Metadata {
-    return this.metadata;
+    return this.metadata as Metadata;
   }
 
   set pluginMetadata(metadata: Metadata) {
@@ -178,3 +181,103 @@ export function install() {
 export function initialize() {
   hank.handleInitialize();
 }
+
+type OneOfKeyValueUnion<T> = T extends { $case: infer U extends string; "value": infer V } ? { [Property in U]: V } : never;
+type AccessCheckShorthand = OneOfKeyValueUnion<AccessCheck["kind"]>
+type AccessCheckOperators = Exclude<keyof typeof AccessCheckOperator, "UNRECOGNIZED">;
+type AccessCheckChainShorthand = Partial<Record<AccessCheckOperators, AccessCheckShorthand[]>>;
+export interface PluginMetadata extends Omit<Metadata, "accessChecks"> {
+  accessChecks: AccessCheckChain
+  | AccessCheckChainShorthand
+  | AccessCheck
+  | AccessCheckShorthand[]
+  | AccessCheckShorthand
+  | undefined;
+};
+
+export const PluginMetadata: MessageFns<PluginMetadata, Metadata> = {
+  create<I extends Exact<DeepPartial<PluginMetadata>, I>>(base?: I): Metadata {
+    let accessChecks = undefined;
+
+    if (isSet(base?.accessChecks)) {
+      if (base?.accessChecks instanceof Object) {
+        let [operator, checks] = Object.entries(base?.accessChecks)[0];
+
+        if (checks instanceof Array) {
+          accessChecks = AccessCheckChain.fromJSON({
+            operator: operator,
+            checks: checks,
+          })
+        } else {
+          accessChecks = AccessCheckChain.fromJSON({
+            operator: accessCheckOperatorFromJSON("OR"),
+            checks: base?.accessChecks,
+          })
+        }
+      }
+
+      if (base?.accessChecks instanceof Array) {
+        accessChecks = AccessCheckChain.fromJSON({
+          operator: accessCheckOperatorFromJSON("OR"),
+          checks: base?.accessChecks,
+        })
+      }
+    }
+
+    (base as PluginMetadata).accessChecks = accessChecks;
+
+    return Metadata.fromPartial(base ?? ({} as any));
+  },
+};
+
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends { $case: string; value: unknown } ? { $case: T["$case"]; value?: DeepPartial<T["value"]> }
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
+
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function isSet(value: any): boolean {
+  return value !== null && value !== undefined;
+}
+interface MessageFns<T, M> {
+  create<I extends Exact<DeepPartial<T>, I>>(base?: I): M;
+}
+
+// hank.pluginMetadata = PluginMetadata.create({
+//   name: "sample-typescript-plugin",
+//   description: "A sample plugin to demonstrate some functionality.",
+//   version: "0.1.0",
+//   database: true,
+//   // accessChecks: {
+//   //   operator: AccessCheckOperator.AND,
+//   //   checks: [
+//   //     { kind: { "$case": "user", value: "marc" } },
+//   //     { kind: { "$case": "user", value: "naught0" } },
+//   //   ],
+//   // },
+//   // accessChecks: AccessCheckChain.create({
+//   //   operator: AccessCheckOperator.OR,
+//   //   checks: [
+//   //     AccessCheck.create({ kind: { "$case": "user", value: "marc" } }),
+//   //     AccessCheck.create({ kind: { "$case": "user", value: "naught0" } }),
+//   //   ],
+//   // })
+//   // accessChecks: {
+//   //   "OR": [
+//   //     { "user": "marc" },
+//   //     { "user": "naught0" },
+//   //   ]
+//   // },
+//   // accessChecks: [
+//   //   { "user": "marc" },
+//   //   { "user": "naught0" },
+//   // ],
+//   accessChecks: { "user": "marc" }
+// });
