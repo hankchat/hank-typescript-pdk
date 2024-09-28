@@ -1,5 +1,6 @@
 declare module "main" {
   export function PluginMetadata();
+  export function plugin();
   export function hank();
   export function get_metadata(): I32;
   export function install();
