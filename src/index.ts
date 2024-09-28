@@ -225,17 +225,14 @@ export const PluginMetadata: MessageFns<PluginMetadata, Metadata> = {
       }
 
       if (!checks[0]?.hasOwnProperty("kind")) {
-        (base as PluginMetadata).description = "Her";
+        // Convert check shorthand into full format
         checks = checks.map(c => Object.entries(c).map(([c, v]) => { return { kind: { "$case": c, value: v } } })).map(([o]) => o);
       }
-      (base as PluginMetadata).version = JSON.stringify(checks);
 
       (base as PluginMetadata).accessChecks = AccessCheckChain.create({
         operator: accessCheckOperatorFromJSON(operator),
         checks,
       });
-
-      (base as PluginMetadata).version = JSON.stringify(base);
     }
 
     return Metadata.create(base ?? ({} as any));
@@ -261,35 +258,3 @@ function isSet(value: any): boolean {
 interface MessageFns<T, M> {
   create<I extends Exact<DeepPartial<T>, I>>(base?: I): M;
 }
-
-// hank.pluginMetadata = PluginMetadata.create({
-//   name: "sample-typescript-plugin",
-//   description: "A sample plugin to demonstrate some functionality.",
-//   version: "0.1.0",
-//   database: true,
-//   // accessChecks: {
-//   //   operator: AccessCheckOperator.AND,
-//   //   checks: [
-//   //     { kind: { "$case": "user", value: "marc" } },
-//   //     { kind: { "$case": "user", value: "naught0" } },
-//   //   ],
-//   // },
-//   // accessChecks: AccessCheckChain.create({
-//   //   operator: AccessCheckOperator.OR,
-//   //   checks: [
-//   //     AccessCheck.create({ kind: { "$case": "user", value: "marc" } }),
-//   //     AccessCheck.create({ kind: { "$case": "user", value: "naught0" } }),
-//   //   ],
-//   // })
-//   // accessChecks: {
-//   //   "OR": [
-//   //     { "user": "marc" },
-//   //     { "user": "naught0" },
-//   //   ]
-//   // },
-//   // accessChecks: [
-//   //   { "user": "marc" },
-//   //   { "user": "naught0" },
-//   // ],
-//   accessChecks: { "user": "marc" }
-// });
