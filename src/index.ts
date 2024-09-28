@@ -197,36 +197,48 @@ export interface PluginMetadata extends Omit<Metadata, "accessChecks"> {
 
 export const PluginMetadata: MessageFns<PluginMetadata, Metadata> = {
   create<I extends Exact<DeepPartial<PluginMetadata>, I>>(base?: I): Metadata {
-    let accessChecks = undefined;
-
     if (isSet(base?.accessChecks)) {
-      if (base?.accessChecks instanceof Object) {
-        let [operator, checks] = Object.entries(base?.accessChecks)[0];
+      let accessChecks = base?.accessChecks ?? AccessCheckChain.create();
+      let operator = "OR";
+      let checks: Array<object> = [];
 
-        if (checks instanceof Array) {
-          accessChecks = AccessCheckChain.fromJSON({
-            operator: operator,
-            checks: checks,
-          })
+      if (accessChecks instanceof Object) {
+        let [key, value] = Object.entries(accessChecks)[0];
+
+        if (value instanceof Array) {
+          // We know it's the OR: [] shorthand
+          [operator, checks] = [key, value];
         } else {
-          accessChecks = AccessCheckChain.fromJSON({
-            operator: accessCheckOperatorFromJSON("OR"),
-            checks: base?.accessChecks,
-          })
+          if (key == "operator") {
+            // We assume this is in the full { operator: "OR", checks: [ {check}, {check}, ] } format,
+            // but we don't assume the checks are in the full format.
+            [operator, checks] = [accessChecks.operator as unknown as string, accessChecks.checks as Array<object>];
+          } else {
+            [operator, checks] = ["OR", [accessChecks]];
+          }
         }
       }
 
-      if (base?.accessChecks instanceof Array) {
-        accessChecks = AccessCheckChain.fromJSON({
-          operator: accessCheckOperatorFromJSON("OR"),
-          checks: base?.accessChecks,
-        })
+      if (accessChecks instanceof Array) {
+        [operator, checks] = ["OR", accessChecks];
+        // We know it's the [ {check}, {check}, ] shorthand
       }
+
+      if (!checks[0]?.hasOwnProperty("kind")) {
+        (base as PluginMetadata).description = "Her";
+        checks = checks.map(c => Object.entries(c).map(([c, v]) => { return { kind: { "$case": c, value: v } } })).map(([o]) => o);
+      }
+      (base as PluginMetadata).version = JSON.stringify(checks);
+
+      (base as PluginMetadata).accessChecks = AccessCheckChain.create({
+        operator: accessCheckOperatorFromJSON(operator),
+        checks,
+      });
+
+      (base as PluginMetadata).version = JSON.stringify(base);
     }
 
-    (base as PluginMetadata).accessChecks = accessChecks;
-
-    return Metadata.fromPartial(base ?? ({} as any));
+    return Metadata.create(base ?? ({} as any));
   },
 };
 
