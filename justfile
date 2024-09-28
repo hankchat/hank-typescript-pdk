@@ -15,7 +15,10 @@ alias e := edit
 @edit:
     $EDITOR "{{ justfile() }}"
 
-publish:
+build:
     npm run build
-    npm version patch
+
+publish version="patch": build
+    npm version {{ version }}
     npm publish
+    git push --follow-tags
