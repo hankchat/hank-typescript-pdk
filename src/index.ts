@@ -4,7 +4,7 @@ import {
   AccessCheckOperator,
   accessCheckOperatorFromJSON,
   CronInput, CronJob, DbQueryInput, DbQueryOutput, HankClientImpl, Message,
-  Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, Results, Rpc,
+  Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, ReloadPluginInput, Results, Rpc,
   SendMessageInput
 } from "@hank.chat/types";
 import { JsonObject } from "type-fest";
@@ -18,15 +18,18 @@ class HankRpc implements Rpc {
   protected react;
   protected db_query;
   protected cron;
+  protected one_shot;;
+  protected reload_plugin;
 
   public constructor() {
-    const { send_message, react, db_query, cron, one_shot } = Host.getFunctions();
+    const { send_message, react, db_query, cron, one_shot, reload_plugin } = Host.getFunctions();
 
     this.send_message = send_message;
     this.react = react;
     this.db_query = db_query;
     this.cron = cron;
     this.one_shot = one_shot;
+    this.reload_plugin = reload_plugin;
   }
 
   public request(_service: string, method: string, data: Uint8Array): Promise<Uint8Array> {
@@ -86,6 +89,13 @@ class Hank {
       job: uuid,
     });
     this.client.one_shot(OneShotInput.create({ oneShotJob: oneshot }));
+  }
+
+  // [Internal]
+  //
+  // @EscalatedPrivileges::RELOAD_PLUGIN
+  public reloadPlugin(plugin: string) {
+    this.client.reload_plugin(ReloadPluginInput.create({ plugin }));
   }
 
   get pluginMetadata(): Metadata {
