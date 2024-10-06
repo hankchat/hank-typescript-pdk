@@ -3,7 +3,6 @@ import {
   AccessCheckChain,
   AccessCheckOperator,
   accessCheckOperatorFromJSON,
-  CommandContext,
   CronInput, CronJob, DbQueryInput, DbQueryOutput, HandleChatCommandInput, HankClientImpl, Message,
   Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, ReloadPluginInput, Results, Rpc,
   SendMessageInput
@@ -120,9 +119,9 @@ class Hank {
     this.chatCommandHandler = handler;
   }
 
-  public handleChatCommand(input: HandleChatCommandInput) {
+  public handleChatCommand({ context, message }: HandleChatCommandInput) {
     if (this.chatCommandHandler) {
-      this.chatCommandHandler(input.context);
+      this.chatCommandHandler(context, message);
     }
   }
 
@@ -167,10 +166,7 @@ export function handle_message() {
 }
 
 export function handle_chat_command() {
-  const context = CommandContext.decode(new Uint8Array(Host.inputBytes()));
-  const input: HandleChatCommandInput = { context };
-
-  hank.handleChatCommand(input);
+  hank.handleChatCommand(HandleChatCommandInput.decode(new Uint8Array(Host.inputBytes())));
 }
 
 export function handle_cron() {
