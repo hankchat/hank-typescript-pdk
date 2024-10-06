@@ -6,7 +6,7 @@ declare module "main" {
   export function install();
   export function initialize();
   export function handle_message();
-  export function handle_command();
+  export function handle_chat_command();
   export function handle_cron();
 }
 

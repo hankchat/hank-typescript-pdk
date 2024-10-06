@@ -3,7 +3,8 @@ import {
   AccessCheckChain,
   AccessCheckOperator,
   accessCheckOperatorFromJSON,
-  CronInput, CronJob, DbQueryInput, DbQueryOutput, HankClientImpl, Message,
+  CommandContext,
+  CronInput, CronJob, DbQueryInput, DbQueryOutput, HandleChatCommandInput, HankClientImpl, Message,
   Metadata, OneShotInput, OneShotJob, PreparedStatement, ReactInput, Reaction, ReloadPluginInput, Results, Rpc,
   SendMessageInput
 } from "@hank.chat/types";
@@ -46,7 +47,7 @@ class Hank {
   protected client: HankClientImpl;
   protected metadata: Metadata | undefined;
   protected messageHandler: Function | undefined;
-  protected commandHandler: Function | undefined;
+  protected chatCommandHandler: Function | undefined;
   protected installFn: Function | undefined;
   protected initializeFn: Function | undefined;
   protected cronjobs: Map<string, Function>;
@@ -106,22 +107,22 @@ class Hank {
     this.metadata = metadata;
   }
 
-  public registerMessageHandler(messageHandler: Function) {
-    this.messageHandler = messageHandler;
+  public registerMessageHandler(handler: Function) {
+    this.messageHandler = handler;
   }
 
   public handleMessage(input: HandleMessageInput) {
     if (this.messageHandler) {
-      this.messageHandler(input);
+      this.messageHandler(input.message);
     }
   }
-  public registerCommandHandler(commandHandler: Function) {
-    this.commandHandler = commandHandler;
+  public registerChatCommandHandler(handler: Function) {
+    this.chatCommandHandler = handler;
   }
 
-  public handleCommand(input: HandleCommandInput) {
-    if (this.commandHandler) {
-      this.commandHandler(input);
+  public handleChatCommand(input: HandleChatCommandInput) {
+    if (this.chatCommandHandler) {
+      this.chatCommandHandler(input.context);
     }
   }
 
@@ -158,10 +159,6 @@ export interface HandleMessageInput {
   message: Message,
 }
 
-export interface HandleCommandInput {
-  message: Message,
-}
-
 export function handle_message() {
   const message = Message.decode(new Uint8Array(Host.inputBytes()));
   const input: HandleMessageInput = { message: message };
@@ -169,11 +166,11 @@ export function handle_message() {
   hank.handleMessage(input);
 }
 
-export function handle_command() {
-  const message = Message.decode(new Uint8Array(Host.inputBytes()));
-  const input: HandleCommandInput = { message: message };
+export function handle_chat_command() {
+  const context = CommandContext.decode(new Uint8Array(Host.inputBytes()));
+  const input: HandleChatCommandInput = { context };
 
-  hank.handleCommand(input);
+  hank.handleChatCommand(input);
 }
 
 export function handle_cron() {
