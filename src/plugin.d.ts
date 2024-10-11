@@ -18,7 +18,6 @@ declare module "extism:host" {
     cron(input: I64): I64;
     one_shot(input: I64): I64;
     reload_plugin(input: I64): I64;
-    install_plugin(input: I64): I64;
     instruct_plugin(input: I64): I64;
   }
 }
