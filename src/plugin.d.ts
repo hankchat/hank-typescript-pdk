@@ -2,12 +2,12 @@ declare module "main" {
   export function PluginMetadata();
   export function plugin();
   export function hank();
-  export function handle_get_metadata(input: I32): I32;
-  export function handle_install(input: I32): I32;
-  export function handle_initialize(input: I32): I32;
-  export function handle_chat_message(input: I32): I32;
-  export function handle_chat_command(input: I32): I32;
-  export function handle_scheduled_job(input: I32): I32;
+  export function handle_get_metadata(): I32;
+  export function handle_install(): I32;
+  export function handle_initialize(): I32;
+  export function handle_chat_message(): I32;
+  export function handle_chat_command(): I32;
+  export function handle_scheduled_job(): I32;
 }
 
 declare module "extism:host" {
