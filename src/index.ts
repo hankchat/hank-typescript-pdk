@@ -166,8 +166,8 @@ export function handle_chat_command() {
 }
 
 export function handle_scheduled_job() {
-  // @TODO
-  hank.handleCron((ScheduledJobInput.decode(new Uint8Array(Host.inputBytes())).scheduledJob as any).value);
+  let input = ScheduledJobInput.decode(new Uint8Array(Host.inputBytes()));
+  hank.handleCron(input.scheduledJob?.value.job as string);
 }
 
 export function handle_get_metadata() {
