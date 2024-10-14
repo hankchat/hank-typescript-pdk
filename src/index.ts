@@ -71,6 +71,11 @@ class Hank {
     let response: DbQueryOutput = await this.client.db_query(
       DbQueryInput.create({ preparedStatement: preparedStatement })
     );
+
+    if (response.error) {
+      throw new Error(response.error);
+    }
+
     return (response.results as Results).rows.map(row => JSON.parse(row) as T);
   }
 
