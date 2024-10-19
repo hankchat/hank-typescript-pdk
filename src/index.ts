@@ -63,8 +63,12 @@ class Hank {
     this.client.send_message(SendMessageInput.create({ message: message }));
   }
 
-  public react(reaction: Reaction) {
-    this.client.react(ReactInput.create({ reaction: reaction }));
+  public react(emoji: string, message: Message) {
+    this.client.react(
+      ReactInput.create({
+        reaction: Reaction.create({ message, emoji }),
+      })
+    );
   }
 
   public async dbQuery<T extends JsonObject>(preparedStatement: PreparedStatement): Promise<Array<T>> {
